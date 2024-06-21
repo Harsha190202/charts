@@ -22,20 +22,6 @@ pipeline {
             }
         }
 
-        stage('Setup Node.js') {
-            steps {
-                script {
-                    sh '''
-                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-                        source ~/.nvm/nvm.sh
-                        nvm install $NODE_VERSION
-                        nvm use $NODE_VERSION
-                        node -v
-                        npm -v
-                    '''
-                }
-            }
-        }
         stage("frontend-dependencies"){
             steps{
                 dir("./mocktest-frontend/"){
