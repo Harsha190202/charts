@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    stages{
+        
+        stage("Front-end clone") {
+            steps{
+                script{
+                    sh "sudo rm -rf tf-ui"
+                    sh "git clone git@10.220.112.253:fractal/tf-ui.git -b ${env.gitlabSourceBranch}"
+                }
+            }
+        }
+        
+        stage("frontend-dependencies"){
+            steps{
+                dir("./QUIZ-APP/"){
+                    script{
+                        sh "npm install"
+                    }
+                }
+            }
+        }
+        stage("front-end-build"){
+            steps {
+                dir("./QUIZ-APP/"){
+                    script{
+                        sh "npm run build"
+                    }
+                }
+            }
+        }
+        stage("Docker Build") {
+            when{
+                expression {
+                    "${env.environment}" != 'premerge-qa'
+                }
+            }
+            steps {
+                
+                script{
+                    sh "aws ecr get-login-password --region ap-south-1 --profile shared-s3 | docker login --username AWS --password-stdin 112606330682.dkr.ecr.ap-south-1.amazonaws.com"
+                    sh "docker build -f TF/tfui/Dockerfile-dev -t tfui ." 
+                script{
+                    if(environment!="premerge-dev"){
+                        sh "docker tag tfui:latest ${ecrUrl}/tfui:${tfuiBranch}-${BUILD_NUMBER}-date-${currentDate}-deploy-${env.environment}-${currentDate}"
+                        sh "docker push ${ecrUrl}/tfui:${tfuiBranch}-${BUILD_NUMBER}-date-${currentDate}-deploy-${env.environment}-${currentDate}"
+                    }
+                    else{
+                        sh "docker tag tfui:latest ${ecrUrl}/tfui:${env.gitlabSourceBranch}-${BUILD_NUMBER}-date-${currentDate}-deploy-${env.environment}-${currentDate}"
+                        sh "docker push ${ecrUrl}/tfui:${env.gitlabSourceBranch}-${BUILD_NUMBER}-date-${currentDate}-deploy-${env.environment}-${currentDate}"
+                    }
+                }
+                }
+            }
+        }
+
+        
+        stage("Helm Deployment") {
+            steps {
+                dir("TF") {
+                    script{
+                        flag ="false"
+                        echo "${flag}"
+                        if ( environment == "premerge-dev"){
+                            helm_deployment("${env.environment}", "tfui","${env.gitlabSourceBranch}-${BUILD_NUMBER}-date-${currentDate}-deploy-${env.environment}-${currentDate}")
+                        }
+                        else{
+                            helm_deployment("${env.environment}", "tfui","${tfuiBranch}-${BUILD_NUMBER}-date-${currentDate}-deploy-${env.environment}-${currentDate}")
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+
+}
+
+
