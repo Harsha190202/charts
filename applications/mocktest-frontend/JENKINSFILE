@@ -5,7 +5,7 @@ pipeline {
         stage("charts Clone"){
             steps{
                 script{
-                    sh "sudo rm -rf charts"
+                    sh "sudo rm -rf ./charts"
                     sh "git clone https://github.com/Harsha190202/charts.git -b ${env.ChartsBranch}"
     
                 }
@@ -14,7 +14,7 @@ pipeline {
         stage("Front-end clone") {
             steps{
                 script{
-                    sh "sudo rm -rf mocktest-frontend"
+                    sh "sudo rm -rf ./mocktest-frontend"
                     sh "git clone https://github.com/Harsha190202/mocktest-frontend.git -b ${env.FrontendBranch}"
                 }
             }
