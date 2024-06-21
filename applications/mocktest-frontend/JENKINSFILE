@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    environment {
+        NODE_VERSION = '20.13.1' 
+    }
     stages{
         stage("charts Clone"){
             steps{
@@ -16,6 +18,17 @@ pipeline {
                 script{
                     sh "rm -rf ./mocktest-frontend"
                     sh "git clone https://github.com/Harsha190202/mocktest-frontend.git -b ${env.FrontendBranch}"
+                }
+            }
+        }
+
+        stage('Setup Node.js') {
+            steps {
+                script {
+                    sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash'
+                    sh '. ~/.nvm/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION'
+                    sh 'node -v'
+                    sh 'npm -v'
                 }
             }
         }
