@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-deployment
+  name: mocktest-frontend-deployment
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: test
+      app: mocktest-frontend
   template:
     metadata:
       labels:
-        app: test
+        app: mocktest-frontend
     spec:
       containers:
-        - name: test-container
+        - name: mocktest-frontend
           image: nginx:latest
           ports:
             - containerPort: 80
