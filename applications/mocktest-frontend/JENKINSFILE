@@ -5,16 +5,17 @@ pipeline {
         stage("charts Clone"){
             steps{
                 script{
-                    sh "sudo rm -rf mocktest-frontend"
-                    sh "git clone https://github.com/Harsha190202/mocktest-frontend.git -b ${env.ChartsBranch}"
+                    sh "sudo rm -rf charts"
+                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.ChartsBranch}"
+    
                 }
             }
         }
         stage("Front-end clone") {
             steps{
                 script{
-                    sh "sudo rm -rf charts"
-                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.FrontendBranch}"
+                    sh "sudo rm -rf mocktest-frontend"
+                    sh "git clone https://github.com/Harsha190202/mocktest-frontend.git -b ${env.FrontendBranch}"
                 }
             }
         }
