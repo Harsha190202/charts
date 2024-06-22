@@ -6,5 +6,6 @@ COPY ./applications/mocktest-frontend/default.conf /etc/nginx/sites-available/de
 COPY ./applications/mocktest-frontend/mime.types /etc/nginx/mime.types
 COPY ./applications/mocktest-frontend/nginx.conf /etc/nginx/nginx.conf
 COPY ./applications/mocktest-frontend/dist.conf /etc/nginx/sites-available/dist
-COPY .mocktest-frontend/build /var/www/build/
+COPY ./mocktest-frontend/build/ /var/www/build/
+WORKDIR /var/www/build
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
