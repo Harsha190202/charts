@@ -46,9 +46,9 @@ pipeline {
         stage("Docker Build") {
             steps {
                 script{
-                    sh "docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ." 
-                    sh "docker tag mocktest-frontend:latest harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${currentDate}-dev"
-                    sh "docker push harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${currentDate}-dev"
+                    sh "sudo docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ." 
+                    sh "sudo docker tag mocktest-frontend:latest harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${currentDate}-dev"
+                    sh "sudo docker push harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${currentDate}-dev"
                 }
             }
         }
