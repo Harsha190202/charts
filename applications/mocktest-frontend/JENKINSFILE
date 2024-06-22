@@ -1,7 +1,7 @@
 pipeline {
     agent any
-    environment {
-        NODEJS_HOME = tool name: 'NodeJS-20.13.1', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+    tools{
+        nodejs '22.3.0'
     }
     stages{
         stage("charts Clone"){
@@ -22,14 +22,25 @@ pipeline {
             }
         }
 
-        stage("frontend-dependencies and build"){
+        stage("frontend-dependencies"){
             steps{
                 dir("./mocktest-frontend/"){
-                    sh "rm -rf /node-modules"
-                    sh "${NODEJS_HOME}/bin/npm install"
-                    sh "${NODEJS_HOME}/bin/npm run build"
+                    script{
+                        sh "rm -rf node_modules"
+                        sh "npm cache clean --force"
+                        sh "npm install"
+                    }
                 }
+            }
+        }
+        stage("front-end-build"){
+            steps {
+                dir("./mocktest-frontend/"){
+                    script{
+                        sh "npm run build --verbose"
+                    }
                 }
+            }
         }
 
         stage("Docker Build") {
