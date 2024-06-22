@@ -1,5 +1,4 @@
-FROM nginx
-LABEL MAINTAINER="manideep.thamma@nslhub.com" version=1.0
+FROM nginx:1.10.1-alpine
 RUN ln -sf /dev/stdout /var/log/nginx/access.log
 RUN ln -sf /dev/stderr /var/log/nginx/error.log
 EXPOSE 3000
