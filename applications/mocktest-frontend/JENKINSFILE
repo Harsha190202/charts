@@ -30,7 +30,6 @@ pipeline {
                     sh "${NODEJS_HOME}/bin/npm run build"
                 }
                 }
-            }
         }
 
         stage("Docker Build") {
