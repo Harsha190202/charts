@@ -69,6 +69,7 @@ pipeline {
     steps {
         script {
             sh """
+                git checkout ${env.ChartsBranch}
                 sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' charts/applications/mocktest-frontend/deployment.yaml
                 cd charts/applications/mocktest-frontend
                 git add deployment.yaml
@@ -77,7 +78,7 @@ pipeline {
             """
             
             withCredentials([gitUsernamePassword(credentialsId: 'github-harsha190202', gitToolName: 'Default')]) {
-                sh "git push"
+                sh "git push origin main"
             }
         }
     }
