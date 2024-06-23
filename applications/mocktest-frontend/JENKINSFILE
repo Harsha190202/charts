@@ -48,7 +48,7 @@ pipeline {
                 script{
                     sh "sudo docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ." 
                     sh "sudo docker tag mocktest-frontend:latest harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
-                    sh "sudo docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD""
+                    sh "sudo docker login "
                     sh "sudo docker push harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
                     sh "sudo docker rmi harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
                 }
