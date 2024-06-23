@@ -67,12 +67,11 @@ pipeline {
 
         stage("Deployment") {
             steps {
-                dir("/applications/") {
+                {
                     script {
                         sh '''
-                            sudo chown -R jenkins:jenkins /
-                            sed -i "s|image: .*|image: ${dockerImage}|g" mocktest-frontend/deployment.yaml
-                            cd mocktest-frontend
+                            sed -i "s|image: .*|image: ${dockerImage}|g" applications/mocktest-frontend/deployment.yaml
+                            cd applications/mocktest-frontend
                             git add deployment.yaml
                             git commit -m "jenkins image update"
                             git pull --rebase
