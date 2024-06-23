@@ -57,7 +57,7 @@ pipeline {
                     sh "sudo docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
                     sh "sudo docker tag mocktest-frontend:latest ${dockerImage}"
-                    docker.withRegistry('registry.docker.io', registryCredential) {
+                    docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
                         sh "sudo docker push ${dockerImage}"
                     }
                     sh "sudo docker rmi ${dockerImage}"
