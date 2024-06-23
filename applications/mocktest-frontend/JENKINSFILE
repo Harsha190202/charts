@@ -69,12 +69,14 @@ pipeline {
             steps {
                 dir("/CHARTS/") {
                     script {
-                        sh "sed -i "s|image: .*|image: ${dockerImage}|g" "charts/applications/mocktest-frontend/deployment.yaml" "
-                        sh "cd charts/applications/mocktest-frontend"
-                        sh "git add deployment.yaml"
-                        sh "git commit -m "jenkins image update""
-                        sh "git pull"
-                        sh "git push"
+                        sh '''
+                            sed -i "s|image: .*|image: ${dockerImage}|g" charts/applications/mocktest-frontend/deployment.yaml
+                            cd charts/applications/mocktest-frontend
+                            git add deployment.yaml
+                            git commit -m "jenkins image update"
+                            git pull --rebase
+                            git push
+                        '''
                     }
                 }
             }
