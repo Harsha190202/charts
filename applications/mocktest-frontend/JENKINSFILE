@@ -66,22 +66,23 @@ pipeline {
         }
 
         stage("Deployment") {
-            steps {
-                script {
-                    sh '''
-                        sed -i "s|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g" charts/applications/mocktest-frontend/deployment.yaml
-                        cd charts/applications/mocktest-frontend
-                        git add deployment.yaml
-                        git commit -m "jenkins image update"
-                        git pull 
-                    '''
-                    withCredentials([gitUsernamePassword(credentialsId: 'github-harsha190202', gitToolName: 'Default')]) {
-                    sh "git push "
-                    }
-                }
-                    
+    steps {
+        script {
+            sh """
+                sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' charts/applications/mocktest-frontend/deployment.yaml
+                cd charts/applications/mocktest-frontend
+                git add deployment.yaml
+                git commit -m "Jenkins image update"
+                git pull 
+            """
+            
+            withCredentials([gitUsernamePassword(credentialsId: 'github-harsha190202', gitToolName: 'Default')]) {
+                sh "git push"
             }
         }
+    }
+}
+
         
     }
 }
