@@ -1,34 +1,38 @@
 pipeline {
     agent any
-    tools{
+    
+    tools {
         nodejs '22.3.0'
     }
-    environment{
-        DOCKERHUB-CREDENTIALS = credentials('harsha3330-dockerhub')
+    
+    environment { 
+        registryCredential = 'harsha3330-dockerhub'
+        dockerImage = ''
     }
-    stages{
-        stage("charts Clone"){
-            steps{
-                script{
+    
+    stages {
+        stage("Charts Clone") {
+            steps {
+                script {
                     sh "rm -rf ./charts"
                     sh "git clone https://github.com/Harsha190202/charts.git -b ${env.ChartsBranch}"
-    
                 }
             }
         }
-        stage("Front-end clone") {
-            steps{
-                script{
+        
+        stage("Front-end Clone") {
+            steps {
+                script {
                     sh "rm -rf ./mocktest-frontend"
                     sh "git clone https://github.com/Harsha190202/mocktest-frontend.git -b ${env.FrontendBranch}"
                 }
             }
         }
 
-        stage("frontend-dependencies"){
-            steps{
-                dir("./mocktest-frontend/"){
-                    script{
+        stage("Front-end Dependencies") {
+            steps {
+                dir("./mocktest-frontend/") {
+                    script {
                         sh "rm -rf node_modules"
                         sh "npm cache clean --force"
                         sh "npm install"
@@ -36,33 +40,35 @@ pipeline {
                 }
             }
         }
-        stage("front-end-build"){
+        
+        stage("Front-end Build") {
             steps {
-                dir("./mocktest-frontend/"){
-                    script{
-                        sh "npm run build "
+                dir("./mocktest-frontend/") {
+                    script {
+                        sh "npm run build"
                     }
                 }
             }
         }
 
-        stage("Docker Build") {
+        stage("Docker Build and Push") {
             steps {
-                script{
-                    sh "sudo docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ." 
-                    sh "sudo docker tag mocktest-frontend:latest harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
-                    sh "sudo echo ${DOCKERHUB-CREDENTIALS} | docker login -u harsha3330 --password-stdin"
-                    sh "sudo docker push harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
-                    sh "sudo docker rmi harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
+                script {
+                    sh "sudo docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
+                    dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
+                    sh "sudo docker tag mocktest-frontend:latest ${dockerImage}"
+                    docker.withRegistry('', registryCredential) {
+                        sh "sudo docker push ${dockerImage}"
+                    }
+                    sh "sudo docker rmi ${dockerImage}"
                 }
             }
         }
 
-        
         stage("Deployment") {
             steps {
                 dir("/CHARTS/") {
-                    script{
+                    script {
                         sh "sed command"
                     }
                 }
@@ -70,7 +76,4 @@ pipeline {
         }
         
     }
-
 }
-
-
