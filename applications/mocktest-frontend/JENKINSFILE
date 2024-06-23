@@ -67,17 +67,15 @@ pipeline {
 
         stage("Deployment") {
             steps {
-                {
-                    script {
-                        sh '''
-                            sed -i "s|image: .*|image: ${dockerImage}|g" applications/mocktest-frontend/deployment.yaml
-                            cd applications/mocktest-frontend
-                            git add deployment.yaml
-                            git commit -m "jenkins image update"
-                            git pull --rebase
-                            git push
-                        '''
-                    }
+                script {
+                    sh '''
+                        sed -i "s|image: .*|image: ${dockerImage}|g" applications/mocktest-frontend/deployment.yaml
+                        cd applications/mocktest-frontend
+                        git add deployment.yaml
+                        git commit -m "jenkins image update"
+                        git pull --rebase
+                        git push
+                    '''
                 }
             }
         }
