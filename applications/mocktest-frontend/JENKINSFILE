@@ -70,7 +70,7 @@ pipeline {
              script {
                 sh """
                 sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' charts/applications/mocktest-frontend/deployment.yaml
-                cd /charts
+                cd charts
                 git checkout ${env.ChartsBranch}
                 git add .
                 git commit -m "Jenkins image update"
