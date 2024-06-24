@@ -68,20 +68,18 @@ pipeline {
         stage("Deployment") {
             steps {
              script {
-                sh """
-                sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' charts/applications/mocktest-frontend/deployment.yaml
-                cd charts
-                git checkout ${env.ChartsBranch}
-                git add .
-                git commit -m "Jenkins image update"
-                git pull
-                """
             
+                sh " cd charts "
                 withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
                 sh """
                     eval \$(ssh-agent -s)
                     ssh-add \$SSH_KEY
                     git remote set-url origin git@github.com:Harsha190202/charts.git
+                    git checkout main 
+                    git pull origin main
+                    sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/mocktest-frontend/deployment.yaml
+                    git add .
+                    git commit -m "Jenkins image update"
                     git pull
                     git push origin main
                 """
