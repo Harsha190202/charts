@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: mocktest-frontend
-          image: nginx:latest
+          image: harsha3330/mocktest-frontend:master-56-date-2024-06-24-dev
           ports:
             - containerPort: 80
