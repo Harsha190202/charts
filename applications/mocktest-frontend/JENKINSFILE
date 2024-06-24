@@ -71,14 +71,13 @@ pipeline {
             sh """
                 git checkout ${env.ChartsBranch}
                 sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' charts/applications/mocktest-frontend/deployment.yaml
-                cd charts/applications/mocktest-frontend
-                git add deployment.yaml
+                git add .
                 git commit -m "Jenkins image update"
                 git pull 
             """
             
-            withCredentials([gitUsernamePassword(credentialsId: 'github-harsha190202', gitToolName: 'Default')]) {
-                sh "git push origin main"
+           withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
+                sh "git push "
             }
         }
     }
