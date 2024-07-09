@@ -21,31 +21,31 @@ spec:
           - name: PORT
             valueFrom:
               configMapKeyRef:
-                name: Backend-Config
+                name: backend-config
                 key: PORT
           - name: CORS_ORIGIN
             valueFrom:
               configMapKeyRef:
-                name: Backend-Config
+                name: backend-config
                 key: CORS_ORIGIN
           - name: ACCESS_TOKEN_SECRET
             valueFrom:
               configMapKeyRef:
-                name: Backend-Config
+                name: backend-config
                 key: ACCESS_TOKEN_SECRET
           - name: ACCESS_TOKEN_EXPIRY
             valueFrom:
               configMapKeyRef:
-                name: Backend-Config
+                name: backend-config
                 key: ACCESS_TOKEN_EXPIRY
           - name: REFRESH_TOKEN_SECRET
             valueFrom:
               configMapKeyRef:
-                name: Backend-Config
+                name: backend-config
                 key: REFRESH_TOKEN_SECRET
           - name: REFRESH_TOKEN_EXPIRY
             valueFrom:
               configMapKeyRef:
-                name: Backend-Config
+                name: backend-config
                 key: REFRESH_TOKEN_EXPIRY
 
