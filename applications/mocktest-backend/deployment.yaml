@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mocktest-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mocktest-backend
+  template:
+    metadata:
+      labels:
+        app: mocktest-backend
+    spec:
+      containers:
+        - name: mocktest-backend
+          image: harsha3330/mocktest-backend:master-57-date-2024-07-08-dev
+          ports:
+            - containerPort: 80
+          env:
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: Backend-Config
+                key: PORT
+          - name: CORS_ORIGIN
+            valueFrom:
+              configMapKeyRef:
+                name: Backend-Config
+                key: CORS_ORIGIN
+          - name: ACCESS_TOKEN_SECRET
+            valueFrom:
+              configMapKeyRef:
+                name: Backend-Config
+                key: ACCESS_TOKEN_SECRET
+          - name: ACCESS_TOKEN_EXPIRY
+            valueFrom:
+              configMapKeyRef:
+                name: Backend-Config
+                key: ACCESS_TOKEN_EXPIRY
+          - name: REFRESH_TOKEN_SECRET
+            valueFrom:
+              configMapKeyRef:
+                name: Backend-Config
+                key: REFRESH_TOKEN_SECRET
+          - name: REFRESH_TOKEN_EXPIRY
+            valueFrom:
+              configMapKeyRef:
+                name: Backend-Config
+                key: REFRESH_TOKEN_EXPIRY
+

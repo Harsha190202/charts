@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+    
+    
+    environment { 
+        registryCredential = 'harsha3330-dockerhub'
+        dockerImage = ''
+    }
+    
+    stages {
+      
+        
+        stage("Backend-end Clone") {
+            steps {
+                script {
+                    sh "rm -rf ./mocktest-backend"
+                    sh "git clone https://github.com/Harsha190202/mocktest-backend.git -b ${env.backendBranch}"
+                }
+            }
+        }
+
+
+        stage("Docker Build and Push") {
+            steps {
+                script {
+                    sh "sudo docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
+                    dockerImage = "harsha3330/mocktest-backend:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
+                    sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
+                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                        sh "sudo docker push ${dockerImage}"
+                    }
+                    sh "sudo docker rmi ${dockerImage}"
+                }
+            }
+        }
+
+        stage("Deployment") {
+            steps {
+             script {
+            
+                sh " cd charts "
+                withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
+                sh """
+                    eval \$(ssh-agent -s)
+                    ssh-add \$SSH_KEY
+                    git remote set-url origin git@github.com:Harsha190202/charts.git
+                    git checkout main 
+                    git pull origin main
+                    sed -i 's|image: .*|image: harsha3330/mocktest-backend:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/mocktest-backend/deployment.yaml
+                    git add .
+                    git commit -m "Jenkins image update"
+                    git pull origin main
+                    git push origin main
+                """
+                }
+            }
+        }
+    }
+
+
+        
+    }
+}

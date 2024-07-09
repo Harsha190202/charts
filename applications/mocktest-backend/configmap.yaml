@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: Backend-Config
+data:
+  PORT: "8000"
+  CORS_ORIGIN: "*"
+  ACCESS_TOKEN_SECRET: "randomaccesstoken"
+  ACCESS_TOKEN_EXPIRY: "1d"
+  REFRESH_TOKEN_SECRET: "randomrefreshtokensecret"
+  REFRESH_TOKEN_EXPIRY: "10d"
