@@ -13,7 +13,7 @@ pipeline {
         stage("Backend-end Clone") {
             steps {
                 script {
-                    sh "rm -rf ./mocktest-backend"
+                    sh "rm -rf ./pyq-mock-backend"
                     sh "git clone https://github.com/pavan-kumar-06/pyq-mock-backend.git -b ${env.backendBranch}"
                 }
             }
