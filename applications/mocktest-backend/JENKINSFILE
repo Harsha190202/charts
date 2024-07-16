@@ -22,7 +22,7 @@ pipeline {
 
         stage("Docker Build and Push") {
             steps {
-                dir("./pyq-mock-backend")
+                dir("./pyq-mock-backend/")
                 script {
                     sh "sudo docker build -f ../applications/mocktest-backend/Dockerfile -t mocktest-backend ."
                     dockerImage = "harsha3330/mocktest-backend:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
