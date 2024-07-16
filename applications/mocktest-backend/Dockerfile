@@ -1,8 +1,8 @@
 FROM node
 WORKDIR /app
-COPY package.json /app
+COPY /pyq-mocktest-backend/package.json /app
 RUN npm install
-COPY . /app
+COPY /pyq-mocktest-backend /app
 EXPOSE 8000
 CMD ["node","src/index.js"]
 
