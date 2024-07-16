@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     sh "rm -rf ./mocktest-backend"
-                    sh "git clone https://github.com/Harsha190202/mocktest-backend.git -b ${env.backendBranch}"
+                    sh "git clone https://github.com/pavan-kumar-06/pyq-mock-backend.git -b ${env.backendBranch}"
                 }
             }
         }
