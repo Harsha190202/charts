@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mocktest-backend
-          image: harsha3330/mocktest-backend:master-57-date-2024-07-08-dev
+          image: harsha3330/mocktest-backend:dev-11-date-2024-07-16-dev
           ports:
             - containerPort: 8000
           env:
