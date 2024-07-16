@@ -24,7 +24,7 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "sudo docker build -f /applications/mocktest-backend/Dockerfile -t mocktest-backend ."
+                    sh "sudo docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
                     dockerImage = "harsha3330/mocktest-backend:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
                     sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
                     docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
