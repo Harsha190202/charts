@@ -7,5 +7,6 @@ spec:
     app: mocktest-frontend
   ports:
     - protocol: TCP
+      port: 80
       targetPort: 32000
   type: NodePort
