@@ -70,7 +70,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
-                    sh '''
+                    sh """
                     cd charts
 
                     git config  --global user.email "jenkins@gmail.com"
@@ -83,7 +83,7 @@ pipeline {
                     git commit -am "Jenkins image update"
                     git pull origin main
                     git push origin main
-                    '''
+                    """
                     }
                 }
             }
