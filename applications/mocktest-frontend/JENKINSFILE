@@ -76,8 +76,7 @@ pipeline {
 
                     git config user.email "${GIT_USER_EMAIL}"
                     git config user.name "${GIT_USER_NAME}"
-                    git checkout ${GIT_BRANCH}
-                    git pull origin ${GIT_BRANCH}
+                    git pull origin main
                         
                     # Update image reference in deployment.yaml
                     sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/mocktest-frontend/deployment.yaml
@@ -85,8 +84,8 @@ pipeline {
                     # Commit and push changes
                     git add applications/mocktest-frontend/deployment.yaml
                     git commit -m "Jenkins image update"
-                    git pull origin ${GIT_BRANCH}
-                    git push origin ${GIT_BRANCH}
+                    git pull origin main
+                    git push origin main
                     '''
                     }
                 }
