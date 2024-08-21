@@ -7,6 +7,7 @@ pipeline {
     
     environment { 
         registryCredential = 'harsha3330-dockerhub'
+        BUILD_TIMESTAMP = "${new java.text.SimpleDateFormat('yyyyMMdd-HHmmss').format(new java.util.Date())}"
         dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
     }
     
