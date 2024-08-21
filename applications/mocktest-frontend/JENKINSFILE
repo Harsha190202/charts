@@ -65,28 +65,36 @@ pipeline {
 
         stage("Deployment") {
             steps {
-             script {
-            
-                sh " cd charts "
-                withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
-                sh """
-                    eval \$(ssh-agent -s)
-                    ssh-add \$SSH_KEY
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                    echo "Changing to charts directory"
+                    cd charts
+
+                    echo "Starting ssh-agent"
+                    eval $(ssh-agent -s)
+                    ssh-add $SSH_KEY
+
+                    echo "Configuring Git"
                     git remote set-url origin git@github.com:Harsha190202/charts.git
-                    git checkout main 
+                    git checkout main
                     git pull origin main
+                    echo "Updating deployment.yaml"
                     sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/mocktest-frontend/deployment.yaml
+
+                    echo "Committing and pushing changes"
                     git add .
                     git commit -m "Jenkins image update"
-                    git pull origin main
+                    git pull origin main  # Handle potential merge conflicts
                     git push origin main
-                """
+
+                    echo "Listing directory contents"
+                    ls -al
+                    '''
+                    }
                 }
             }
         }
-    }
-
-
         
     }
 }
