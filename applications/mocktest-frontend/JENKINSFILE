@@ -7,7 +7,7 @@ pipeline {
     
     environment { 
         registryCredential = 'harsha3330-dockerhub'
-        dockerImage = ''
+        dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
     }
     
     stages {
@@ -55,7 +55,6 @@ pipeline {
             steps {
                 script {
                     sh "docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
-                    dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
                     sh "docker tag mocktest-frontend:latest ${dockerImage}"
                     docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
                         sh "docker push ${dockerImage}"
