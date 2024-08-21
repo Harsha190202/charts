@@ -54,13 +54,13 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "sudo docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
+                    sh "docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
-                    sh "sudo docker tag mocktest-frontend:latest ${dockerImage}"
+                    sh "docker tag mocktest-frontend:latest ${dockerImage}"
                     docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-                        sh "sudo docker push ${dockerImage}"
+                        sh "docker push ${dockerImage}"
                     }
-                    sh "sudo docker rmi ${dockerImage}"
+                    sh "docker rmi ${dockerImage}"
                 }
             }
         }
