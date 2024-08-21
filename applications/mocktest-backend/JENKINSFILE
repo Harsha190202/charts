@@ -6,6 +6,10 @@ pipeline {
         registryCredential = 'harsha3330-dockerhub'
         dockerImage = ''
     }
+
+    tools {
+        nodejs 'NodeJS22'
+    }
     
     stages {
       
