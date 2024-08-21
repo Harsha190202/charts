@@ -82,7 +82,8 @@ pipeline {
                     sed -i 's|image: .*|image: ${dockerImage}|g' applications/mocktest-frontend/deployment.yaml
                     git commit -am "Jenkins image update"
                     git pull origin main
-                    git push origin main
+                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main
+
                     """
                     }
                 }
