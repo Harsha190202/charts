@@ -43,7 +43,7 @@ pipeline {
                     sh "sudo docker build -f applications/library-system/DOCKERFILE -t mocktest-backend ."
                     dockerImage = "harsha3330/library-system:${env.AppBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
                     sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
-                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                    docker.withRegistry('https://registry.hub.docker.com',docker-hub-credentials) {
                         sh "sudo docker push ${dockerImage}"
                     }
                     sh "sudo docker rmi ${dockerImage}"
