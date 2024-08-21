@@ -12,14 +12,7 @@ pipeline {
     }
     
     stages {
-        stage("Charts Clone") {
-            steps {
-                script {
-                    sh "rm -rf ./charts"
-                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.ChartsBranch}"
-                }
-            }
-        }
+        
         
         stage("Front-end Clone") {
             steps {
@@ -63,33 +56,37 @@ pipeline {
             }
         }
 
+
+        stage("Charts Clone") {
+            steps {
+                script {
+                    sh "rm -rf ./charts"
+                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.GitBranch}"
+                }
+            }
+        }
+
         stage("Deployment") {
             steps {
                 script {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
+                    withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                     echo "Changing to charts directory"
                     cd charts
 
-                    echo "Starting ssh-agent"
-                    eval $(ssh-agent -s)
-                    ssh-add $SSH_KEY
-
-                    echo "Configuring Git"
-                    git remote set-url origin git@github.com:Harsha190202/charts.git
-                    git checkout main
-                    git pull origin main
-                    echo "Updating deployment.yaml"
+                    git config user.email "${GIT_USER_EMAIL}"
+                    git config user.name "${GIT_USER_NAME}"
+                    git checkout ${GIT_BRANCH}
+                    git pull origin ${GIT_BRANCH}
+                        
+                    # Update image reference in deployment.yaml
                     sed -i 's|image: .*|image: harsha3330/mocktest-frontend:${env.FrontendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/mocktest-frontend/deployment.yaml
-
-                    echo "Committing and pushing changes"
-                    git add .
+                        
+                    # Commit and push changes
+                    git add applications/mocktest-frontend/deployment.yaml
                     git commit -m "Jenkins image update"
-                    git pull origin main  # Handle potential merge conflicts
-                    git push origin main
-
-                    echo "Listing directory contents"
-                    ls -al
+                    git pull origin ${GIT_BRANCH}
+                    git push origin ${GIT_BRANCH}
                     '''
                     }
                 }
