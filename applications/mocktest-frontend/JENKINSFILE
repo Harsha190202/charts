@@ -80,7 +80,7 @@ pipeline {
                     git checkout main 
                     git pull origin main
                     sed -i 's|image: .*|image: ${dockerImage}|g' applications/mocktest-frontend/deployment.yaml
-                    git commit -m "Jenkins image update"
+                    git commit -am "Jenkins image update"
                     git pull origin main
                     git push origin main
                     '''
