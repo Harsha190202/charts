@@ -57,9 +57,7 @@ pipeline {
                 script {
                     sh "docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     sh "docker tag mocktest-frontend:latest ${dockerImage}"
-                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-                        sh "docker push ${dockerImage}"
-                    }
+                    sh "docker push ${dockerImage}"
                     sh "docker rmi ${dockerImage}"
                 }
             }
