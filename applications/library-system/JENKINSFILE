@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+    
+    
+    environment { 
+        registryCredential = 'harsha3330-dockerhub'
+        dockerImage = ''
+    }
+    
+    stages {
+      
+        
+        stage("Library Next App Clone") {
+            steps {
+                script {
+                    sh "rm -rf ./library-management-system"
+                    sh "git clone https://github.com/Harsha190202/library-management-system.git -b ${env.AppBranch}"
+                    echo "Completed clone"
+                }
+            }
+        }
+
+        stage("Sonar Scan"){
+            steps{
+                script{
+                    
+                }
+            }
+        }
+
+        stage("Charts Clone") {
+            steps {
+                script {
+                    sh "rm -rf ./charts"
+                    sh "git clone git@github.com:Harsha190202/charts.git -b ${env.ChartsBranch}"
+                }
+            }
+        }
+
+        stage("Docker Build and Push") {
+            steps {
+                script {
+                    sh "sudo docker build -f applications/library-system/DOCKERFILE -t mocktest-backend ."
+                    dockerImage = "harsha3330/library-system:${env.AppBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
+                    sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
+                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                        sh "sudo docker push ${dockerImage}"
+                    }
+                    sh "sudo docker rmi ${dockerImage}"
+                }
+            }
+        }
+
+        stage("Deployment") {
+            steps {
+             script {
+            
+                sh " cd charts "
+                withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
+                sh """
+                    eval \$(ssh-agent -s)
+                    ssh-add \$SSH_KEY
+                    git remote set-url origin git@github.com:Harsha190202/charts.git
+                    git checkout main 
+                    git pull origin main
+                    sed -i 's|tag: .*|tag: harsha3330/library-system:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/library-system/values.yaml
+                    git add .
+                    git commit -m "Jenkins image update"
+                    git pull origin main
+                    git push origin main
+                """
+                }
+            }
+        }
+    }
+
+
+        
+    }
+}
