@@ -3,12 +3,14 @@ pipeline {
     
     tools {
         nodejs 'NodeJS22'
+        sonarQubeScanner 'SonarQube'
     }
     
     environment { 
         registryCredential = 'harsha3330-dockerhub'
         buildTimestamp = new java.text.SimpleDateFormat('yyyyMMdd-HHmmss').format(new java.util.Date())
         dockerImage = "harsha3330/mocktest-frontend:${env.FrontendBranch}-${env.BUILD_NUMBER}-date-${buildTimestamp}-dev"
+        SONARQUBE_ENV = 'SonarQube'
     }
     
     stages {
