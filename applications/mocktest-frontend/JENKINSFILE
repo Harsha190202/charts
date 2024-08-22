@@ -49,11 +49,14 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv(SONARQUBE_ENV) {
-                    sh 'npx sonar-scanner' 
-                }
-            }
+                dir("./mocktest-frontend/") {
+                    withSonarQubeEnv(SONARQUBE_ENV) {
+                        sh 'npx sonar-scanner' 
+                    }
+                }       
+            }   
         }
+
 
         stage('Quality Gate') {
             steps {
