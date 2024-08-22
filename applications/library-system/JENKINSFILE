@@ -1,13 +1,15 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs 'NodeJS22'
+    }
     
     environment { 
         registryCredential = 'harsha3330-dockerhub'
-        dockerImage = ''
-    }
-    tools {
-        nodejs 'NodeJS22'
+        buildTimestamp = new java.text.SimpleDateFormat('yyyyMMdd-HHmmss').format(new java.util.Date())
+        dockerImage = "harsha3330/mocktest-frontend:${env.AppBranch}-${env.BUILD_NUMBER}-date-${buildTimestamp}-dev"
+        SONARQUBE_ENV = 'SonarQube'
     }
     stages {
       
@@ -22,10 +24,21 @@ pipeline {
             }
         }
 
-        stage("Sonar Scan"){
-            steps{
-                script{
-                    
+        stage('SonarQube Analysis') {
+            steps {
+                dir("./mocktest-frontend/") {
+                    withSonarQubeEnv(SONARQUBE_ENV) {
+                        sh 'npx sonar-scanner' 
+                    }
+                }       
+            }   
+        }
+
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -42,12 +55,9 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "sudo docker build -f applications/library-system/DOCKERFILE -t mocktest-backend ."
-                    dockerImage = "harsha3330/library-system:${env.AppBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
-                    sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
-                    docker.withRegistry('https://registry.hub.docker.com',docker-hub-credentials) {
-                        sh "sudo docker push ${dockerImage}"
-                    }
+                    sh "sudo docker build -f applications/library-system/DOCKERFILE -t library-management-app ."
+                    sh "sudo docker tag library-management-app:latest ${dockerImage}"
+                    sh "sudo docker push ${dockerImage}"
                     sh "sudo docker rmi ${dockerImage}"
                 }
             }
@@ -55,22 +65,21 @@ pipeline {
 
         stage("Deployment") {
             steps {
-             script {
-            
-                sh " cd charts "
-                withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
-                sh """
-                    eval \$(ssh-agent -s)
-                    ssh-add \$SSH_KEY
-                    git remote set-url origin git@github.com:Harsha190202/charts.git
+                script {
+                    withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
+                    sh """
+                    cd charts
+
+                    git remote set-url origin https://github.com/Harsha190202/charts.git
                     git checkout main 
                     git pull origin main
-                    sed -i 's|tag: .*|tag: harsha3330/library-system:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/library-system/values.yaml
-                    git add .
-                    git commit -m "Jenkins image update"
+                    sed -i 's|imagetag: .*|imagetag: ${dockerImage}|g' applications/library-system/values.yaml
+                    git commit -am "Jenkins image update"
                     git pull origin main
-                    git push origin main
-                """
+                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main
+
+                    """
+                    }
                 }
             }
         }
