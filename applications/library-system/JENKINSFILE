@@ -8,7 +8,7 @@ pipeline {
     environment { 
         registryCredential = 'harsha3330-dockerhub'
         buildTimestamp = new java.text.SimpleDateFormat('yyyyMMdd-HHmmss').format(new java.util.Date())
-        dockerImage = "harsha3330/library-management-system:${env.AppBranch}-${env.BUILD_NUMBER}-date-${buildTimestamp}-dev"
+        dockerImage = "harsha3330/:${env.AppBranch}-${env.BUILD_NUMBER}-date-${buildTimestamp}-dev"
         SONARQUBE_ENV = 'SonarQube'
     }
     stages {
@@ -47,10 +47,10 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "sudo docker build -f applications/library-system/DOCKERFILE -t library-management-app ."
-                    sh "sudo docker tag library-management-app:latest ${dockerImage}"
-                    sh "sudo docker push ${dockerImage}"
-                    sh "sudo docker rmi ${dockerImage}"
+                    sh "docker build -f applications/library-system/DOCKERFILE -t library-management-app ."
+                    sh "docker tag library-management-app:latest ${dockerImage}"
+                    sh "docker push ${dockerImage}"
+                    sh "docker rmi ${dockerImage}"
                 }
             }
         }
