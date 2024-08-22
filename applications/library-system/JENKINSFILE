@@ -47,6 +47,7 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
+                    sh "docker login"
                     sh "docker build -f applications/library-system/DOCKERFILE -t library-management-app ."
                     sh "docker tag library-management-app:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
