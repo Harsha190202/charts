@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: nginx
   pullPolicy: IfNotPresent
-  imagetag: ""
+  imagetag: harsha3330/library-management-system:dev-16-date-20240822-120922
 
 imagePullSecrets: []
 nameOverride: ""
