@@ -73,9 +73,6 @@ pipeline {
                     sh """
                     cd charts
 
-                    git config  --global user.email "jenkins@gmail.com"
-                    git config  --global user.name "jenkins"
-
                     git remote set-url origin https://github.com/Harsha190202/charts.git
                     git checkout main 
                     git pull origin main

@@ -4,7 +4,8 @@ pipeline {
     
     environment { 
         registryCredential = 'harsha3330-dockerhub'
-        dockerImage = ''
+        buildTimestamp = new java.text.SimpleDateFormat('yyyyMMdd-HHmmss').format(new java.util.Date())
+        dockerImage = "harsha3330/mocktest-frontend:${env.backBranch}-${env.BUILD_NUMBER}-date-${buildTimestamp}-dev"
     }
 
     tools {
@@ -24,7 +25,20 @@ pipeline {
             }
         }
 
-        stage("Charts Clone") {
+       
+
+        stage("Docker Build and Push") {
+            steps {
+                script {
+                    sh "sudo docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
+                    sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
+                    sh "sudo docker push ${dockerImage}"
+                    sh "sudo docker rmi ${dockerImage}"
+                }
+            }
+        }
+
+         stage("Charts Clone") {
             steps {
                 script {
                     sh "rm -rf ./charts"
@@ -33,40 +47,26 @@ pipeline {
             }
         }
 
-        stage("Docker Build and Push") {
-            steps {
-                script {
-                    sh "sudo docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
-                    dockerImage = "harsha3330/mocktest-backend:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev"
-                    sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
-                    sh "sudo docker push ${dockerImage}"
-                    sh "sudo docker rmi ${dockerImage}"
-                }
-            }
-        }
-
         stage("Deployment") {
             steps {
-             script {
-            
-                sh " cd charts "
-                withCredentials([sshUserPrivateKey(credentialsId: 'github-jenkins', keyFileVariable: 'SSH_KEY')]) {
-                sh """
-                    eval \$(ssh-agent -s)
-                    ssh-add \$SSH_KEY
-                    git remote set-url origin git@github.com:Harsha190202/charts.git
+                script {
+                    withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
+                    sh """
+                    cd charts
+
+                    git remote set-url origin https://github.com/Harsha190202/charts.git
                     git checkout main 
                     git pull origin main
-                    sed -i 's|image: .*|image: harsha3330/mocktest-backend:${env.backendBranch}-${BUILD_NUMBER}-date-${BUILD_TIMESTAMP}-dev|g' applications/mocktest-backend/deployment.yaml
-                    git add .
-                    git commit -m "Jenkins image update"
+                    sed -i 's|image: .*|image: ${dockerImage}|g' applications/mocktest-backend/deployment.yaml
+                    git commit -am "Jenkins image update"
                     git pull origin main
-                    git push origin main
-                """
+                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main
+
+                    """
+                    }
                 }
             }
         }
-    }
 
 
         
