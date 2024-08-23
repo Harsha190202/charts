@@ -75,7 +75,7 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
+                    sh "docker build -f charts/applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     sh "docker tag mocktest-frontend:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
                 }
