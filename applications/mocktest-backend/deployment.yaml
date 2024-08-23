@@ -18,69 +18,68 @@ spec:
           ports:
             - containerPort: 8000
           env:
-          - name: PORT
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: PORT
-          - name: CORS_ORIGIN
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: CORS_ORIGIN
-          - name: ACCESS_TOKEN_SECRET
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: ACCESS_TOKEN_SECRET
-          - name: ACCESS_TOKEN_EXPIRY
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: ACCESS_TOKEN_EXPIRY
-          - name: REFRESH_TOKEN_SECRET
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: REFRESH_TOKEN_SECRET
-          - name: REFRESH_TOKEN_EXPIRY
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: REFRESH_TOKEN_EXPIRY
-          - name: MONGODB_URI
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: MONGODB_URI
-          - name: ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: ACCESS_KEY
-          - name: SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: SECRET_ACCESS_KEY
-          - name: CLOUDFRONT_DISTRIBUTION_URL
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: CLOUDFRONT_DISTRIBUTION_URL
-          - name: S3_BUCKET_URL
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: S3_BUCKET_URL
-          - name: BUCKET_NAME_QUESTIONS
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: BUCKET_NAME_QUESTIONS
-          - name: BUCKET_REGION
-            valueFrom:
-              secretKeyRef:
-                name: mocktest-backend-dev
-                key: BUCKET_REGION
-
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: PORT
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: CORS_ORIGIN
+            - name: ACCESS_TOKEN_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: ACCESS_TOKEN_SECRET
+            - name: ACCESS_TOKEN_EXPIRY
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: ACCESS_TOKEN_EXPIRY
+            - name: REFRESH_TOKEN_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: REFRESH_TOKEN_SECRET
+            - name: REFRESH_TOKEN_EXPIRY
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: REFRESH_TOKEN_EXPIRY
+            - name: BUCKET_NAME_QUESTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: BUCKET_NAME_QUESTIONS
+            - name: BUCKET_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: BUCKET_REGION
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mocktest-backend-dev
+                  key: MONGODB_URI
+            - name: ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mocktest-backend-dev
+                  key: ACCESS_KEY
+            - name: SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mocktest-backend-dev
+                  key: SECRET_ACCESS_KEY
+            - name: CLOUDFRONT_DISTRIBUTION_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mocktest-backend-dev
+                  key: CLOUDFRONT_DISTRIBUTION_URL
+            - name: S3_BUCKET_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mocktest-backend-dev
+                  key: S3_BUCKET_URL

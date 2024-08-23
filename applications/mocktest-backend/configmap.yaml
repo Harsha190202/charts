@@ -9,3 +9,6 @@ data:
   ACCESS_TOKEN_EXPIRY: "1d"
   REFRESH_TOKEN_SECRET: "randomrefreshtokensecret"
   REFRESH_TOKEN_EXPIRY: "10d"
+  BUCKET_NAME_QUESTIONS: "pyq-mock-test"
+  BUCKET_REGION: "ap-south-1"
+#remove / at last or else coming data base name error
