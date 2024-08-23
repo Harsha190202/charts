@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: mocktest-frontend
-          image: harsha3330/mocktest-frontend:master-28-date-20240822-114600-dev
+          image: harsha3330/mocktest-frontend:master-32-date-20240823-160945
           ports:
             - containerPort: 80
