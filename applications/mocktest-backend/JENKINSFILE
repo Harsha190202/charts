@@ -31,10 +31,11 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "sudo docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
-                    sh "sudo docker tag mocktest-backend:latest ${dockerImage}"
-                    sh "sudo docker push ${dockerImage}"
-                    sh "sudo docker rmi ${dockerImage}"
+                    sh "docker login"
+                    sh "docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
+                    sh "docker tag mocktest-backend:latest ${dockerImage}"
+                    sh "docker push ${dockerImage}"
+                    sh "docker rmi ${dockerImage}"
                 }
             }
         }
