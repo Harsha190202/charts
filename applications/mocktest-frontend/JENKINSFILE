@@ -13,12 +13,17 @@ pipeline {
     }
     
     stages {
+
+        stage('Cleaning Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
         
         
         stage("Front-end Clone") {
             steps {
                 script {
-                    sh "rm -rf ./mocktest-frontend"
                     sh "git clone https://github.com/Harsha190202/mocktest-frontend.git -b ${env.FrontendBranch}"
                 }
             }
@@ -28,7 +33,6 @@ pipeline {
             steps {
                 dir("./mocktest-frontend/") {
                     script {
-                        sh "rm -rf node_modules"
                         sh "npm cache clean --force"
                         sh "npm install"
                     }
@@ -64,8 +68,15 @@ pipeline {
                     sh "docker build -f applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     sh "docker tag mocktest-frontend:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
-                    sh "docker rmi ${dockerImage}"
                 }
+            }
+        }
+
+
+        stage("TRIVY Image Scan") {
+            steps {
+                sh "trivy image ${dockerImage} > trivyimage.txt" 
+                sh "docker rmi ${dockerImage}"
             }
         }
 
