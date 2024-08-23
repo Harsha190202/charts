@@ -62,6 +62,16 @@ pipeline {
         }
 
 
+        stage("Charts Clone") {
+            steps {
+                script {
+                    sh "rm -rf ./charts"
+                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.GitBranch}"
+                }
+            }
+        }
+
+
         stage("Docker Build and Push") {
             steps {
                 script {
@@ -81,14 +91,7 @@ pipeline {
         }
 
 
-        stage("Charts Clone") {
-            steps {
-                script {
-                    sh "rm -rf ./charts"
-                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.GitBranch}"
-                }
-            }
-        }
+        
 
         stage("Deployment") {
             steps {
