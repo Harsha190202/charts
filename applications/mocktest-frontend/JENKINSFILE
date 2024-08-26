@@ -19,6 +19,13 @@ pipeline {
                 cleanWs()
             }
         }
+
+
+        stage('Charts from Git') {
+            steps {
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Harsha190202/EKS.git'
+            }
+        }
         
         
         stage("Front-end Clone") {
@@ -62,22 +69,10 @@ pipeline {
         }
 
 
-        stage("Charts Clone") {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'github-pat')]){
-                        sh "git clone https://github.com/Harsha190202/EKS.git -b ${env.GitBranch}"
-                    }
-                    
-                }
-            }
-        }
-
-
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "docker build -f EKS-Project/k8-manifests/mocktest-frontend/Dockerfile -t mocktest-frontend ."
+                    sh "docker build -f k8-manifests/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     sh "docker tag mocktest-frontend:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
                 }
@@ -95,21 +90,16 @@ pipeline {
 
         
 
-        stage("Deployment") {
+         stage("Deployment") {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                     sh """
-                    cd EKS
-
-                    git remote set-url origin https://github.com/Harsha190202/EKS.git
-                    git checkout main 
-                    git pull origin main
                     sed -i 's|image: .*|image: ${dockerImage}|g' k8-manifests/mocktest-frontend/deployment.yaml
-                    git commit -am "Jenkins image update"
-                    git pull origin main
-                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main
-
+                    git add k8-manifests/mocktest-frontend/deployment.yaml
+                    git commit -m "Jenkins image update"
+                    git pull https://${GITHUB_TOKEN}@github.com/Harsha190202/EKS.git main
+                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/EKS.git main
                     """
                     }
                 }

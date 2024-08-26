@@ -21,6 +21,13 @@ pipeline {
             }
         }
       
+
+       stage('Charts from Git') {
+            steps {
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Harsha190202/EKS.git'
+            }
+        }
+        
         
         stage("Backend-end Clone") {
             steps {
@@ -31,22 +38,11 @@ pipeline {
             }
         }
 
-       stage("Charts Clone") {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'github-pat')]){
-                        sh "git clone https://github.com/Harsha190202/EKS.git -b ${env.GitBranch}"
-                    }
-                    
-                }
-            }
-        }
-
         stage("Docker Build and Push") {
             steps {
                 script {
                     sh "docker login"
-                    sh "docker build -f EKS-Project/k8-manifests/mocktest-backend/Dockerfile -t mocktest-backend ."
+                    sh "docker build -f k8-manifests/mocktest-backend/Dockerfile -t mocktest-backend ."
                     sh "docker tag mocktest-backend:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
                 }
@@ -68,16 +64,11 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                     sh """
-                    cd EKS
-
-                    git remote set-url origin https://github.com/Harsha190202/EKS.git
-                    git checkout main 
-                    git pull origin main
                     sed -i 's|image: .*|image: ${dockerImage}|g' k8-manifests/mocktest-backend/deployment.yaml
-                    git commit -am "Jenkins image update"
-                    git pull origin main
+                    git add k8-manifests/mocktest-backend/deployment.yaml
+                    git commit -m "Jenkins image update"
+                    git pull https://${GITHUB_TOKEN}@github.com/Harsha190202/EKS.git main
                     git push https://${GITHUB_TOKEN}@github.com/Harsha190202/EKS.git main
-
                     """
                     }
                 }
