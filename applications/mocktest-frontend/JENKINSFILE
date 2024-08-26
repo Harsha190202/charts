@@ -65,8 +65,10 @@ pipeline {
         stage("Charts Clone") {
             steps {
                 script {
-                    sh "rm -rf ./charts"
-                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.GitBranch}"
+                    withCredentials([string(credentialsId: 'github-pat')]){
+                        sh "git clone https://github.com/Harsha190202/EKS.git -b ${env.GitBranch}"
+                    }
+                    
                 }
             }
         }
@@ -75,7 +77,7 @@ pipeline {
         stage("Docker Build and Push") {
             steps {
                 script {
-                    sh "docker build -f charts/applications/mocktest-frontend/Dockerfile -t mocktest-frontend ."
+                    sh "docker build -f EKS-Project/k8-manifests/mocktest-frontend/Dockerfile -t mocktest-frontend ."
                     sh "docker tag mocktest-frontend:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
                 }
@@ -98,12 +100,12 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                     sh """
-                    cd charts
+                    cd EKS
 
-                    git remote set-url origin https://github.com/Harsha190202/charts.git
+                    git remote set-url origin https://github.com/Harsha190202/EKS.git
                     git checkout main 
                     git pull origin main
-                    sed -i 's|image: .*|image: ${dockerImage}|g' applications/mocktest-frontend/deployment.yaml
+                    sed -i 's|image: .*|image: ${dockerImage}|g' k8-manifests/mocktest-frontend/deployment.yaml
                     git commit -am "Jenkins image update"
                     git pull origin main
                     git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main

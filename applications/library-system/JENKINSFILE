@@ -12,12 +12,17 @@ pipeline {
         SONARQUBE_ENV = 'SonarQube'
     }
     stages {
-      
+
+
+        stage('Cleaning Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
         
         stage("Library Next App Clone") {
             steps {
                 script {
-                    sh "rm -rf ./library-management-system"
                     sh "git clone https://github.com/Harsha190202/library-management-system.git -b ${env.AppBranch}"
                     echo "Completed clone"
                 }
@@ -35,11 +40,13 @@ pipeline {
         }
 
 
-        stage("Charts Clone") {
+         stage("Charts Clone") {
             steps {
                 script {
-                    sh "rm -rf ./charts"
-                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.ChartsBranch}"
+                    withCredentials([string(credentialsId: 'github-pat')]){
+                        sh "git clone https://github.com/Harsha190202/EKS.git -b ${env.GitBranch}"
+                    }
+                    
                 }
             }
         }
@@ -48,11 +55,17 @@ pipeline {
             steps {
                 script {
                     sh "docker login"
-                    sh "docker build -f applications/library-system/DOCKERFILE -t library-management-app ."
+                    sh "docker build -f EKS-Project/k8-manifests/library-app/Dockerfile -t library-management-app ."
                     sh "docker tag library-management-app:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
-                    sh "docker rmi ${dockerImage}"
                 }
+            }
+        }
+
+        stage("TRIVY Image Scan") {
+            steps {
+                sh "trivy image ${dockerImage} > trivyimage.txt" 
+                sh "docker rmi ${dockerImage}"
             }
         }
 
@@ -61,15 +74,15 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                     sh """
-                    cd charts
+                    cd EKS
 
                     git remote set-url origin https://github.com/Harsha190202/charts.git
                     git checkout main 
                     git pull origin main
-                    sed -i 's|imagetag: .*|imagetag: ${dockerImage}|g' applications/library-system/values.yaml
+                    sed -i 's|imagetag: .*|imagetag: ${dockerImage}|g' k8-manifests/library-app/deployment.yaml
                     git commit -am "Jenkins image update"
                     git pull origin main
-                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main
+                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/EKS.git main
 
                     """
                     }

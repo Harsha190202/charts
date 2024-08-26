@@ -14,55 +14,69 @@ pipeline {
     }
     
     stages {
+
+        stage('Cleaning Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
       
         
         stage("Backend-end Clone") {
             steps {
                 script {
-                    sh "rm -rf ./pyq-mock-backend"
                     sh "git clone https://github.com/pavan-kumar-06/pyq-mock-backend.git -b ${env.backendBranch}"
                     echo "Completed clone"
                 }
             }
         }
 
-       
+       stage("Charts Clone") {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'github-pat')]){
+                        sh "git clone https://github.com/Harsha190202/EKS.git -b ${env.GitBranch}"
+                    }
+                    
+                }
+            }
+        }
 
         stage("Docker Build and Push") {
             steps {
                 script {
                     sh "docker login"
-                    sh "docker build -f applications/mocktest-backend/Dockerfile -t mocktest-backend ."
+                    sh "docker build -f EKS-Project/k8-manifests/mocktest-backend/Dockerfile -t mocktest-backend ."
                     sh "docker tag mocktest-backend:latest ${dockerImage}"
                     sh "docker push ${dockerImage}"
-                    sh "docker rmi ${dockerImage}"
                 }
             }
         }
 
-         stage("Charts Clone") {
+
+        stage("TRIVY Image Scan") {
             steps {
-                script {
-                    sh "rm -rf ./charts"
-                    sh "git clone https://github.com/Harsha190202/charts.git -b ${env.ChartsBranch}"
-                }
+                sh "trivy image ${dockerImage} > trivyimage.txt" 
+                sh "docker rmi ${dockerImage}"
             }
         }
+
+        
 
         stage("Deployment") {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                     sh """
-                    cd charts
+                    cd EKS
 
-                    git remote set-url origin https://github.com/Harsha190202/charts.git
+                    git remote set-url origin https://github.com/Harsha190202/EKS.git
                     git checkout main 
                     git pull origin main
-                    sed -i 's|image: .*|image: ${dockerImage}|g' applications/mocktest-backend/deployment.yaml
+                    sed -i 's|image: .*|image: ${dockerImage}|g' k8-manifests/mocktest-backend/deployment.yaml
                     git commit -am "Jenkins image update"
                     git pull origin main
-                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/charts.git main
+                    git push https://${GITHUB_TOKEN}@github.com/Harsha190202/EKS.git main
 
                     """
                     }
